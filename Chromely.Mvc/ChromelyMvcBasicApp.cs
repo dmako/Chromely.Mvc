@@ -1,6 +1,4 @@
-﻿using System;
-using Chromely.Core.Host;
-using Chromely.Windows;
+﻿using Chromely.Core.Host;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Chromely.Mvc
@@ -18,7 +16,7 @@ namespace Chromely.Mvc
         public override void Configure(IServiceCollection container)
         {
             base.Configure(container);
-            container.AddSingleton<IChromelyWindow, ChromelyWindow>();
+            container.AddSingleton<IChromelyWindow, Window>();
         }
 
         /// <summary>

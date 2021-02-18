@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Chromely.Core.Network;
@@ -44,27 +45,27 @@ namespace Chromely.Mvc
                     }
                     else
                     {
-                        switch (requestContext.Method)
+                        switch (requestContext.Method.Method)
                         {
-                            case Method.GET:
+                            case "GET":
                                 actions = new[] { "index", "get" };
                                 break;
-                            case Method.POST:
+                            case "POST":
                                 actions = new[] { "post" };
                                 break;
-                            case Method.PUT:
+                            case "PUT":
                                 actions = new[] { "put" };
                                 break;
-                            case Method.DELETE:
+                            case "DELETE":
                                 actions = new[] { "delete" };
                                 break;
-                            case Method.OPTIONS:
+                            case "OPTIONS":
                                 actions = new[] { "options" };
                                 break;
-                            case Method.HEAD:
+                            case "HEAD":
                                 actions = new[] { "head" };
                                 break;
-                            case Method.MERGE:
+                            case "MERGE":
                                 actions = new[] { "merge" };
                                 break;
                         }
@@ -94,7 +95,7 @@ namespace Chromely.Mvc
         }
 
 
-        private MethodInfo GetMatchingAction(Method method, Type controllerType, string action)
+        private MethodInfo GetMatchingAction(HttpMethod method, Type controllerType, string action)
         {
             foreach (var methodInfo in controllerType.GetMethods())
             {
@@ -102,7 +103,7 @@ namespace Chromely.Mvc
                 {
                     if (attribute is HttpVerbAttribute verbAttribute)
                     {
-                        if (string.Equals(verbAttribute.Method, Enum.GetName(typeof(Method), method), StringComparison.InvariantCultureIgnoreCase)
+                        if (string.Equals(verbAttribute.Method, Enum.GetName(typeof(HttpMethod), method), StringComparison.InvariantCultureIgnoreCase)
                             && (
                                 string.Equals(action, methodInfo.Name, StringComparison.InvariantCultureIgnoreCase)
                                 || (verbAttribute.Action != null && string.Equals(action, verbAttribute.Action, StringComparison.InvariantCultureIgnoreCase))
@@ -116,7 +117,7 @@ namespace Chromely.Mvc
 
             foreach (var methodInfo in controllerType.GetMethods())
             {
-                if (string.Equals(methodInfo.Name, Enum.GetName(typeof(Method), method), StringComparison.InvariantCultureIgnoreCase))
+                if (string.Equals(methodInfo.Name, Enum.GetName(typeof(HttpMethod), method), StringComparison.InvariantCultureIgnoreCase))
                 {
                     return methodInfo;
                 }

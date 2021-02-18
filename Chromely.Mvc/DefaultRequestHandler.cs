@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Chromely.Core.Network;
@@ -25,7 +26,7 @@ namespace Chromely.Mvc
             _modelBinder = modelBinder;
         }
 
-        public ChromelyResponse Run(ChromelyRequest request)
+        public IChromelyResponse Run(IChromelyRequest request)
         {
             var parameters = request.Parameters ?? request.RoutePath.Path.GetParameters()?.ToObjectDictionary();
             var postData = request.PostData;
@@ -33,7 +34,7 @@ namespace Chromely.Mvc
             return ExcuteRoute(request.RoutePath, parameters, postData);
         }
 
-        public Task<ChromelyResponse> RunAsync(ChromelyRequest request)
+        public Task<IChromelyResponse> RunAsync(IChromelyRequest request)
         {
             var parameters = request.Parameters ?? request.RoutePath.Path.GetParameters()?.ToObjectDictionary();
             var postData = request.PostData;
@@ -41,7 +42,7 @@ namespace Chromely.Mvc
             return ExcuteRouteAsync(request.RoutePath, parameters, postData);
         }
 
-        public ChromelyResponse Run(string requestId, RoutePath routePath, IDictionary<string, string> parameters, object postData, string requestData)
+        public IChromelyResponse Run(string requestId, IDictionary<string, string> parameters, object postData, string requestData)
         {
             if (routePath == null || string.IsNullOrWhiteSpace(routePath?.Path))
             {
@@ -52,7 +53,7 @@ namespace Chromely.Mvc
         }
 
 
-        public Task<ChromelyResponse> RunAsync(string requestId, RoutePath routePath, IDictionary<string, string> parameters, object postData, string requestData)
+        public Task<IChromelyResponse> RunAsync(string requestId, IDictionary<string, string> parameters, object postData, string requestData)
         {
             if (routePath == null || string.IsNullOrWhiteSpace(routePath?.Path))
             {
@@ -62,29 +63,39 @@ namespace Chromely.Mvc
             return ExcuteRouteAsync(routePath, parameters, postData, requestId);
         }
 
-        public Task<ChromelyResponse> RunAsync(string method, string path, IDictionary<string, string> parameters, object postData)
+        public IChromelyResponse Run(string requestId, string routeUrl, IDictionary<string, string> parameters, object postData, string requestData)
         {
-            var routePath = new RoutePath(method, path);
-            if (string.IsNullOrWhiteSpace(routePath?.Path))
-            {
-                return Task.FromResult(GetBadRequestResponse(null));
-            }
-
-            return ExcuteRouteAsync(routePath, parameters, postData);
+            throw new NotImplementedException();
         }
 
-        public ChromelyResponse Run(string method, string path, IDictionary<string, string> parameters, object postData)
+        public Task<IChromelyResponse> RunAsync(string requestId, string routeUrl, IDictionary<string, string> parameters, object postData, string requestData)
         {
-            var routePath = new RoutePath(method, path);
-            if (string.IsNullOrWhiteSpace(routePath?.Path))
-            {
-                return GetBadRequestResponse(null);
-            }
-
-            return ExcuteRoute(routePath, parameters, postData);
+            throw new NotImplementedException();
         }
 
-        private RequestContext GetRequestContext(Method method, string path, string requestId = null)
+        //public Task<IChromelyResponse> RunAsync(string method, IDictionary<string, string> parameters, object postData)
+        //{
+        //    var routePath = new RoutePath(method, path);
+        //    if (string.IsNullOrWhiteSpace(routePath?.Path))
+        //    {
+        //        return Task.FromResult(GetBadRequestResponse(null));
+        //    }
+
+        //    return ExcuteRouteAsync(routePath, parameters, postData);
+        //}
+
+        //public IChromelyResponse Run(string method, IDictionary<string, string> parameters, object postData)
+        //{
+        //    var routePath = new RoutePath(method, path);
+        //    if (string.IsNullOrWhiteSpace(routePath?.Path))
+        //    {
+        //        return GetBadRequestResponse(null);
+        //    }
+
+        //    return ExcuteRoute(routePath, parameters, postData);
+        //}
+
+        private RequestContext GetRequestContext(HttpMethod method, string path, string requestId = null)
         {
             var querySplitIndex = path.IndexOf('?');
             var url = "";
@@ -136,7 +147,7 @@ namespace Chromely.Mvc
             };
         }
 
-        private ChromelyResponse ExcuteRoute(RoutePath routePath, IDictionary<string, string> parameters, object postData, string requestId = null)
+        private IChromelyResponse ExcuteRoute(RoutePath routePath, IDictionary<string, string> parameters, object postData, string requestId = null)
         {
 
             object result = null;
@@ -176,7 +187,7 @@ namespace Chromely.Mvc
             };
         }
 
-        private async Task<ChromelyResponse> ExcuteRouteAsync(RoutePath routePath, object parameters, object postData, string requestId = null)
+        private async Task<IChromelyResponse> ExcuteRouteAsync(RoutePath routePath, object parameters, object postData, string requestId = null)
         {
             object result = null;
             var status = 200;
@@ -293,7 +304,7 @@ namespace Chromely.Mvc
             return arguments.ToArray();
         }
 
-        private ChromelyResponse GetBadRequestResponse(string requestId)
+        private IChromelyResponse GetBadRequestResponse(string requestId)
         {
             return new ChromelyResponse
             {
@@ -303,6 +314,5 @@ namespace Chromely.Mvc
                 StatusText = "Bad Request"
             };
         }
-
     }
 }

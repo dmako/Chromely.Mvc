@@ -1,10 +1,9 @@
-﻿using System;
-using System.Text;
-using Caliburn.Light;
-using Chromely.Core;
+﻿using Chromely.Core;
 using Chromely.Core.Configuration;
 using Chromely.Core.Logging;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System;
 
 namespace Chromely.Mvc
 {
@@ -13,7 +12,7 @@ namespace Chromely.Mvc
         private IServiceCollection _container;
         private IChromelyConfiguration _config;
         private IChromelyAppSettings _appSettings;
-        private IChromelyLogger _logger;
+        private ILogger _logger;
         private ChromelyMvcApp _chromelyApp;
         private int _stepCompleted;
 
@@ -52,12 +51,12 @@ namespace Chromely.Mvc
             return this;
         }
 
-        public MvcAppBuilder UseLogger<T>(IChromelyLogger logger = null) where T : IChromelyLogger
+        public MvcAppBuilder UseLogger<T>(ILogger logger = null) where T : ILogger
         {
             _logger = logger;
             if (_logger == null)
             {
-                EnsureIsDerivedType(typeof(IChromelyLogger), typeof(T));
+                EnsureIsDerivedType(typeof(ILogger), typeof(T));
                 _logger = (T)Activator.CreateInstance(typeof(T));
             }
 
@@ -133,13 +132,13 @@ namespace Chromely.Mvc
                     }
                     catch (Exception exception)
                     {
-                        Logger.Instance.Log.Error(exception);
+                        Logger.Instance.Log.LogError(exception, string.Empty);
                     }
                 }
             }
             catch (Exception exception)
             {
-                Logger.Instance.Log.Error(exception);
+                Logger.Instance.Log.LogError(exception, string.Empty);
             }
         }
 

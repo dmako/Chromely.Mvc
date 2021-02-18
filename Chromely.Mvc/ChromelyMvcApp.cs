@@ -8,8 +8,9 @@ using Chromely.Core.Host;
 using Chromely.Core.Infrastructure;
 using Chromely.Core.Logging;
 using Chromely.Core.Network;
-using Chromely.Native;
+using Chromely.NativeHost;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Chromely.Mvc
 {
@@ -46,7 +47,7 @@ namespace Chromely.Mvc
             }
         }
 
-        public virtual void Initialize(IServiceCollection container, IChromelyAppSettings appSettings, IChromelyConfiguration config, IChromelyLogger chromelyLogger)
+        public virtual void Initialize(IServiceCollection container, IChromelyAppSettings appSettings, IChromelyConfiguration config, ILogger chromelyLogger)
         {
             EnsureExpectedWorkingDirectory();
 
@@ -61,12 +62,6 @@ namespace Chromely.Mvc
             #endregion
 
             #region Configuration 
-
-            if (config == null)
-            {
-                var configurator = new ConfigurationHandler();
-                config = configurator.Parse<DefaultConfiguration>();
-            }
 
             if (config == null)
             {
@@ -106,12 +101,12 @@ namespace Chromely.Mvc
             #endregion
 
             // Register all primary objects
-            _container.AddSingleton<IChromelyContainer>(new ChromelyServiceCollectionContainer(_container));
+            //_container.AddSingleton<IChromelyContainer>(new ChromelyServiceCollectionContainer(_container));
             _container.AddSingleton(_container);
             _container.AddSingleton(appSettings);
             _container.AddSingleton(config);
             _container.AddSingleton(chromelyLogger);
-            _container.AddSingleton(NativeHostFactory.GetNativeHost(config));
+            _container.AddSingleton(NativeHostBase.NativeInstance);
             _container.AddChromelyMvcWithDefaultRoutes();
         }
 
@@ -135,7 +130,7 @@ namespace Chromely.Mvc
             }
 
             if (config.UrlSchemes == null) config.UrlSchemes = new List<UrlScheme>();
-            if (config.ControllerAssemblies == null) config.ControllerAssemblies = new List<ControllerAssemblyInfo>();
+            //if (config.ControllerAssemblies == null) config.ControllerAssemblies = new List<ControllerAssemblyInfo>();
             if (config.CommandLineArgs == null) config.CommandLineArgs = new Dictionary<string, string>();
             if (config.CommandLineOptions == null) config.CommandLineOptions = new List<string>();
             if (config.CustomSettings == null) config.CustomSettings = new Dictionary<string, string>();
@@ -166,7 +161,7 @@ namespace Chromely.Mvc
             }
             catch (Exception exception)
             {
-                Logger.Instance.Log.Error(exception);
+                Logger.Instance.Log.LogError(exception, string.Empty);
             }
         }
     }
